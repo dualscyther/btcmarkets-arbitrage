@@ -16,7 +16,13 @@ client = BTCMarkets (api_key, private_key)
 fiat_fee = 0.007
 crypto_fee = 0.0022
 
-pairs = (('ETH','AUD'), ('ETH', 'BTC'), ('BTC', 'AUD'))
+tickers = ['ETH', 'BCH', 'LTC', 'ETC', 'XRP']
+pairs = []
+for ticker in tickers:
+  pairs.append((ticker, 'AUD'))
+  pairs.append((ticker, 'BTC'))
+# Add special pair
+pairs.append(('BTC', 'AUD'))
 
 # So prices['ETH']['AUD'] is the conversion rate from ETH to AUD
 # So 1 ETH * prices['ETH']['AUD'] ~= 300
@@ -29,13 +35,40 @@ for pair in pairs:
 
 for pair in pairs:
   result = client.get_market_tick(pair[0], pair[1])
-  print(result['bestBid'])
-  print(result['bestAsk'])
+  # print(result['bestBid'])
+  # print(result['bestAsk'])
 
-  rates[pair[0]][pair[1]] = result['bestAsk']
-  rates[pair[1]][pair[0]] = 1/result['bestBid']
+  rates[pair[0]][pair[1]] = result['bestBid']
+  rates[pair[1]][pair[0]] = 1/result['bestAsk']
 
-print(rates)
+# print(rates)
 
-# print client.get_market_tick('ETH','BTC')
-# print client.get_market_tick('BTC','AUD')
+
+cycles_percentages = []
+
+# For AUD to ticker to BTC to AUD (and vice versa)
+for ticker in tickers:
+  start = 1
+  cur = start
+  cur = (cur * (1-fiat_fee)) * rates['AUD'][ticker]
+  cur = (cur * (1-crypto_fee)) * rates[ticker]['BTC']
+  cur = (cur * (1-fiat_fee)) * rates['BTC']['AUD']
+  print cur, 'AUD to', ticker, 'to BTC to AUD'
+
+  cur = start
+  cur = (cur * (1-fiat_fee)) * rates['AUD']['BTC']
+  cur = (cur * (1-crypto_fee)) * rates['BTC'][ticker]
+  cur = (cur * (1-fiat_fee)) * rates[ticker]['AUD']
+  print cur, 'AUD to', 'to BTC to', ticker, 'to AUD'
+
+# For AUD to ticker to BTC to ticker2 to AUD
+for t1 in tickers:
+  for t2 in tickers:
+    start = 1
+
+    cur = start
+    cur = (cur * (1-fiat_fee)) * rates['AUD'][t1]
+    cur = (cur * (1-crypto_fee)) * rates[t1]['BTC']
+    cur = (cur * (1-crypto_fee)) * rates['BTC'][t2]
+    cur = (cur * (1-fiat_fee)) * rates[t2]['AUD']
+    print cur, 'AUD to', t1, 'to BTC to', t2, 'to AUD'
