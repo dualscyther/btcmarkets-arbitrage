@@ -1,4 +1,4 @@
-from btcmarkets import BTCMarkets 
+from btcmarkets import BTCMarkets
 
 import config
 
@@ -53,13 +53,17 @@ for ticker in tickers:
   cur = (cur * (1-fiat_fee)) * rates['AUD'][ticker]
   cur = (cur * (1-crypto_fee)) * rates[ticker]['BTC']
   cur = (cur * (1-fiat_fee)) * rates['BTC']['AUD']
-  print cur, 'AUD to', ticker, 'to BTC to AUD'
+  print "%.4f AUD to %s to BTC to AUD" % (cur, ticker)
+  if cur > 1:
+    print rates
 
   cur = start
   cur = (cur * (1-fiat_fee)) * rates['AUD']['BTC']
   cur = (cur * (1-crypto_fee)) * rates['BTC'][ticker]
   cur = (cur * (1-fiat_fee)) * rates[ticker]['AUD']
-  print cur, 'AUD to', 'to BTC to', ticker, 'to AUD'
+  print "%.4f AUD to BTC to %s to AUD" % (cur, ticker)
+  if cur > 1:
+    print rates
 
 # For AUD to ticker to BTC to ticker2 to AUD
 for t1 in tickers:
@@ -71,4 +75,6 @@ for t1 in tickers:
     cur = (cur * (1-crypto_fee)) * rates[t1]['BTC']
     cur = (cur * (1-crypto_fee)) * rates['BTC'][t2]
     cur = (cur * (1-fiat_fee)) * rates[t2]['AUD']
-    print cur, 'AUD to', t1, 'to BTC to', t2, 'to AUD'
+    print "%.4f AUD to %s to BTC to %s to AUD" % (cur, t1, t2)
+    if cur > 1:
+      print rates
