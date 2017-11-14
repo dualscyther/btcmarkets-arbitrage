@@ -1,3 +1,7 @@
+# Simple arbitrage detector based on the API below
+Just run run.sh
+
+
 BTC Markets python client
 =================
 
